@@ -73,7 +73,7 @@ def main():
             running_loss = 0.0
             running_corrects = 0
 
-            # 遍历数据加载器
+            # 遍历数据加载器 （按设定的每组数据集个数）
             for inputs, labels in dataloaders[phase]:
                 # 将输入和标签移动到GPU
                 inputs = inputs.to(device)
@@ -82,32 +82,42 @@ def main():
                 # 梯度清零
                 optimizer.zero_grad()
 
-                # 前向传播
+                # 前向传播 （torch.set_grad_enabled是梯度计算器开关，传true开启 作为上下文工具使用）
                 with torch.set_grad_enabled(phase == 'train'):
+                    # 使用模型计算输出 （这时候传给模型的是几个参数）
                     outputs = model(inputs)
+                    # 计算预测值 就是第几中数据（最大值所在的索引）
                     _, preds = torch.max(outputs, 1)
+                    # 计算损失
                     loss = criterion(outputs, labels)
 
                     if phase == 'train':
+                        # 反向传播
                         loss.backward()
+                        # 梯度下降
                         optimizer.step()
 
+                # 计算损失和准确率
                 running_loss += loss.item() * inputs.size(0)
                 running_corrects += torch.sum(preds == labels.data)
 
+            # 计算损失和准确率
             epoch_loss = running_loss / dataset_sizes[phase]
             epoch_acc = running_corrects.double() / dataset_sizes[phase]
             print('{} Loss: {:.4f} Acc: {:.4f}'.format(phase, epoch_loss, epoch_acc))
+    # 保存模型参数
     torch.save(model.state_dict(), 'model1.pth')
 
 
 def test():
+    # 加载学习文件
     params = torch.load('model1.pth')
-
+    # 按照模型结构创建模型
     model = models.resnet50()
     num_ftrs = model.fc.in_features
     model.fc = nn.Linear(num_ftrs, 2)
     model.load_state_dict(params, strict=False)
+    # 模式为验证模式
     model.eval()
 
     # 数据预处理
@@ -117,17 +127,20 @@ def test():
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ])
 
-    # 加载图像
+    # 加载单张图像
     image = Image.open('data/dataset/end/Dog/55.jpg')
     image = transform(image).unsqueeze(0)
+    # image = torch.cat((image, image), dim=0)
 
     # 预测
     with torch.no_grad():
+        # 计算输出 （这里的传入参数形式也是多一维的tensor，因为训练的时候就是一组一组的）
         output = model(image)
         print(output)
+        # 计算预测值 (得到每行中最大值的索引 如果0大就是猫 1大就是狗 因为ImageFolder加载数据的时候就是按照文件夹名字的顺序加载的)
         _, predicted = torch.max(output, 1)
 
     print('Predicted:', '猫' if predicted.item() == 0 else '狗')
 
 if __name__ == '__main__':
-    main()
+    test()
