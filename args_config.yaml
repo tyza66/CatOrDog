@@ -1,0 +1,29 @@
+batch_size: 8
+config_file: null
+distributed: false
+finetune: null
+gpu_id:
+- 0
+input_size:
+- 224
+- 224
+log_freq: 10
+loss_type: CELoss
+lr: 0.1
+milestones:
+- 10
+- 20
+- 40
+momentum: 0.9
+net_type: mobilenet_v2
+num_epochs: 50
+num_warn_up: 3
+num_workers: 2
+optim_type: SGD
+progress: true
+scheduler: multi-step
+test_data: ./data/dataset/test
+train_data: ./data/dataset/train
+use_prune: false
+weight_decay: 0.0005
+work_dir: output
