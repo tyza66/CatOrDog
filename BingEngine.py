@@ -103,12 +103,13 @@ def test():
     ])
 
     # 加载图像
-    image = Image.open('data/dataset/end/Dog/13.jpg')
+    image = Image.open('data/dataset/end/Dog/55.jpg')
     image = transform(image).unsqueeze(0)
 
     # 预测
     with torch.no_grad():
         output = model(image)
+        print(output)
         _, predicted = torch.max(output, 1)
 
     print('Predicted:', '猫' if predicted.item() == 0 else '狗')
