@@ -1,6 +1,6 @@
 train_transform: "train"       # 训练使用的数据增强方法
 test_transform: "val"          # 测试使用的数据增强方法
-net_type: "resnet18"           # 骨干网络,支持：resnet18/50,mobilenet_v2,googlenet,inception_v3
+net_type: "resnet18"           # 骨干网络,支持：resnet18/50,mobilenet_v2, googlenet,inception_v3
 width_mult: 1.0
 input_size: [ 224,224 ]        # 模型输入大小
 rgb_mean: [ 0.5, 0.5, 0.5 ]    # for normalize inputs to [-1, 1],Sequence of means for each channel.
